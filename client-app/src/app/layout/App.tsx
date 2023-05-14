@@ -1,10 +1,11 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles.css';
 import axios from 'axios';
-import { Button, Container, Header, List } from 'semantic-ui-react';
+import { Button, Container } from 'semantic-ui-react';
 import { Activity } from '../models/activity';
 import NavBar from './NavBar';
 import ActivitiesDashboard from '../features/activities/dashboard/ActivitiesDashboard';
+import {v4 as uuid } from 'uuid';
 
 function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -26,13 +27,24 @@ function App() {
   }
 
   function handleFormOpen(id?: string){
-    id? handleSelectActivity(id) : handleCancelSelectedActivity
+    id? handleSelectActivity(id) : handleCancelSelectedActivity()
     setEditMode(true)
   }
 
   function handleFormClose(){
     setEditMode(false)
   }
+
+  function handleDeleteActivity(id: string){
+    setActivities([...activities.filter(x=> x.id!== id)])
+  }
+
+  function handleCreateOrEditActivity(activity: Activity){
+    activity.id? setActivities([...activities.filter(x=> x.id!==activity.id), activity]):
+    setActivities([...activities, {...activity, id: uuid()}])
+    setEditMode(false)
+    setSelectedActivity(activity);
+}
 
   return (
     <>
@@ -45,6 +57,8 @@ function App() {
           editMode={editMode}
           handleFormOpen={handleFormOpen}
           handleFormClose = {handleFormClose}
+          createOrEdit={handleCreateOrEditActivity}
+          deleteActivity = {handleDeleteActivity}
           />
           <Button content='test'/>
         </Container>
